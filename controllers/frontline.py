@@ -38,3 +38,28 @@ class Gtline:
             
         base = init.gettitle()
         return init.frender.line(line, rsnew, linearr,statarr, base)
+
+class Gtlinenew:
+    def GET(self, linename=''):
+        if(linename == ''):
+            raise web.seeother('/')
+        
+        line = mysql.conn.select('gt_line', where={'keychar':linename})
+        if(not line):
+            raise web.seeother('/')
+
+        line = line[0]
+        #return helps.htmlshow(line)
+        line_id = line['id']
+        stats = mysql.conn.query("select stat_name,jingweidu from gt_fullstats gf where gf.line_id = %s order by gf.sortnum asc,gf.id asc" % line_id)
+        linestatarr = {}
+        linearr = {}
+        if (len(stats)>1):
+            linestatarr[str(line.id)] = stats
+            linearr[str(line.id)] = line
+        base = init.gettitle()
+        #return helps.htmlshow(linestatarr['1'])
+        speed = str(line['speed'])
+        line_id = str(line_id)
+        linestats = linestatarr 
+        return init.allrender.everygaotie(linearr, linestatarr, linestats, base, line, speed, line_id) 
